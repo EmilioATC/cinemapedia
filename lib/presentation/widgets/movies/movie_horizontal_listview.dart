@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MovieHorizontalListview extends StatefulWidget {
   final List<Movie> movies;
@@ -17,27 +18,27 @@ class MovieHorizontalListview extends StatefulWidget {
       this.loadNextPage});
 
   @override
-  State<MovieHorizontalListview> createState() => _MovieHorizontalListviewState();
+  State<MovieHorizontalListview> createState() =>
+      _MovieHorizontalListviewState();
 }
 
 class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
-
   final ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    scrollController.addListener((){
-        if(widget.loadNextPage == null) return;
+    scrollController.addListener(() {
+      if (widget.loadNextPage == null) return;
 
-        if(scrollController.position.pixels + 200 >= scrollController.position.maxScrollExtent ){
-          
-          widget.loadNextPage!();
-        }
+      if (scrollController.position.pixels + 200 >=
+          scrollController.position.maxScrollExtent) {
+        widget.loadNextPage!();
+      }
     });
   }
 
-@override
+  @override
   void dispose() {
     scrollController.dispose();
     super.dispose();
@@ -90,18 +91,22 @@ class _Slide extends StatelessWidget {
                 fit: BoxFit.cover,
                 width: 150,
                 loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress != null){
+                  if (loadingProgress != null) {
                     return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: const CircularProgressIndicator(strokeWidth: 2,)
-                      ),
-                  );
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                          child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                      )),
+                    );
                   }
-                  return FadeIn(child: child);
+                  return GestureDetector(
+                    child: FadeIn(child: child),
+                    onTap: () => context.push('/movie/${movie.id}'),
+                  );
                 },
-                ),
               ),
+            ),
           ),
 
           const SizedBox(height: 5),
@@ -123,15 +128,16 @@ class _Slide extends StatelessWidget {
               children: [
                 Icon(Icons.star_half_outlined, color: Colors.amber, size: 15),
                 const SizedBox(width: 5),
-                Text(movie.voteAverage.toString(), style: titleStyle.bodyMedium?.copyWith(color: Colors.amber)),
+                Text(movie.voteAverage.toString(),
+                    style:
+                        titleStyle.bodyMedium?.copyWith(color: Colors.amber)),
                 const Spacer(),
-                Text( HumanFormats.number(movie.popularity), style: titleStyle.bodySmall),
+                Text(HumanFormats.number(movie.popularity),
+                    style: titleStyle.bodySmall),
                 // Text('${movie.popularity}', style: titleStyle.bodySmall),
-            
               ],
             ),
           )
-
         ],
       ),
     );
