@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -152,20 +153,22 @@ class _ActorsByMovie extends ConsumerWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
           itemCount: actors.length,
-          itemBuilder: (context, index) {
+          itemBuilder: (context, index) {  
             final actor = actors[index];
             return Container(
               padding: const EdgeInsets.all(8),
               width: 135,
               child: Column(
                 children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.network(
-                    actor.profilePath,
-                    height: 150,
-                    width: 135,
-                    fit: BoxFit.cover,
+                FadeIn(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      actor.profilePath,
+                      height: 150,
+                      width: 135,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -214,6 +217,10 @@ class _CustomSliverAppBar extends StatelessWidget {
               child: Image.network(
                 movie.backdropPath,
                 fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress != null) return const SizedBox();
+                  return FadeIn(child: child);
+                },
               ),
             ),
             const SizedBox.expand(
