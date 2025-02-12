@@ -13,6 +13,7 @@ class CustomAppbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
     final title = Theme.of(context).textTheme.titleMedium;
+    final bool isDarkmode = ref.watch(themeNotifierProvider).isDarkMode;
 
     return SafeArea(
         bottom: false,
@@ -33,9 +34,17 @@ class CustomAppbar extends ConsumerWidget {
                 ),
                 const Spacer(),
                 IconButton(
+                  onPressed: () {
+                    ref.read(themeNotifierProvider.notifier).toggleDarkMode();
+                  },
+                  icon: Icon(isDarkmode
+                      ? Icons.light_mode_outlined
+                      : Icons.dark_mode_outlined),
+                ),
+                IconButton(
                     onPressed: () async {
                       //final movieRepository = ref.read(movieRepositoryProvider);
-                      final searchedMovies = ref.read( searchedMoviesProvider );
+                      final searchedMovies = ref.read(searchedMoviesProvider);
                       final searchQuery = ref.watch(searchQueryProvider);
 
                       final movie = await showSearch<Movie?>(
@@ -43,7 +52,9 @@ class CustomAppbar extends ConsumerWidget {
                         context: context,
                         delegate: SearchMovieDelegate(
                           initialMovies: searchedMovies,
-                          searchMovies: ref.read(searchedMoviesProvider.notifier).searchMoviesByQuery,
+                          searchMovies: ref
+                              .read(searchedMoviesProvider.notifier)
+                              .searchMoviesByQuery,
                         ),
                       );
 

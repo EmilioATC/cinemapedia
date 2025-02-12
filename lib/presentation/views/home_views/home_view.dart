@@ -38,7 +38,6 @@ class HomeViewState extends ConsumerState<HomeView> {
         expandedHeight: 10,
         actions: [],
         title: CustomAppbar(),
-        backgroundColor: Colors.white,
       ),
       SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
