@@ -1,4 +1,5 @@
 import 'package:cinemapedia/presentation/screens/screens.dart';
+import 'package:cinemapedia/presentation/views/home_views/categories_view.dart';
 import 'package:cinemapedia/presentation/views/views.dart';
 import 'package:cinemapedia/presentation/widgets/shared/custom_bottom_navigation.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +29,7 @@ final appRouter = GoRouter(initialLocation: '/', routes: [
       StatefulShellBranch(routes: <RouteBase>[
         GoRoute(
           path: '/categories',
-          builder: (context, state) => FavoritesView(),
+          builder: (context, state) => CategoriesView(),
         )
       ]),
       StatefulShellBranch(routes: <RouteBase>[

@@ -54,14 +54,20 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
   }
 }
 
-class _MovieDetails extends StatelessWidget {
+final isFavoriteProvider = FutureProvider.family((ref, int movieId) {
+  final localStorageRepository = ref.watch(localStorageRepositoryProvider);
+  return localStorageRepository.isMovieFavorite(movieId);
+});
+
+class _MovieDetails extends ConsumerWidget {
   final Movie movie;
   const _MovieDetails({required this.movie});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
     final size = MediaQuery.of(context).size;
     final textStyles = Theme.of(context).textTheme;
+    final isFavoriteMovie = ref.watch(isFavoriteProvider(movie.id));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,12 +125,29 @@ class _MovieDetails extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.favorite,
-                    color: Colors.pink,
-                    size: 30.0,
-                  )),
+                  onPressed: () async{
+                    // await ref
+                    //     .read(localStorageRepositoryProvider)
+                    //     .toggleFavorite(movie);
+
+                    await ref.read(favoriteMoviesProvider.notifier).toggleFavorite(movie);
+
+                    ref.invalidate(isFavoriteProvider(movie.id));
+                  },
+                  icon: isFavoriteMovie.when(
+                      data: (isFavorite) => isFavorite
+                          ? const Icon(Icons.favorite_rounded,
+                              color: Colors.pink, size: 30.0)
+                          : const Icon(Icons.favorite_rounded, size: 30.0),
+                      error: (_, __) => throw UnimplementedError(),
+                      loading: () => const CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ))),
+              // icon: Icon(
+              //   Icons.favorite,
+              //   color: Colors.pink,
+              //   size: 30.0,
+              // )),
               IconButton(
                   onPressed: () {},
                   icon: Icon(
@@ -276,7 +299,6 @@ class _CustomSliverAppBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final bool isDarkmode = ref.watch(themeNotifierProvider).isDarkMode;
-
     return SliverAppBar(
       floating: true,
       expandedHeight: 10,

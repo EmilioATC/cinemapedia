@@ -132,6 +132,8 @@ class _Slide extends StatelessWidget {
                     style:
                         titleStyle.bodyMedium?.copyWith(color: Colors.yellow.shade900)),
                 const Spacer(),
+                Icon(Icons.people_outline , size: 15),
+                const SizedBox(width: 5),
                 Text(HumanFormats.number(movie.popularity),
                     style: titleStyle.bodySmall),
                 // Text('${movie.popularity}', style: titleStyle.bodySmall),
