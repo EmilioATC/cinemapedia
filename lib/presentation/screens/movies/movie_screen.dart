@@ -1,5 +1,8 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
+import 'package:cinemapedia/presentation/widgets/movies/actors_movie.dart';
+import 'package:cinemapedia/presentation/widgets/movies/movies_similar.dart';
+import 'package:cinemapedia/presentation/widgets/videos/videos_movie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -54,14 +57,20 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
   }
 }
 
-class _MovieDetails extends StatelessWidget {
+final isFavoriteProvider = FutureProvider.family((ref, int movieId) {
+  final localStorageRepository = ref.watch(localStorageRepositoryProvider);
+  return localStorageRepository.isMovieFavorite(movieId);
+});
+
+class _MovieDetails extends ConsumerWidget {
   final Movie movie;
   const _MovieDetails({required this.movie});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
     final size = MediaQuery.of(context).size;
     final textStyles = Theme.of(context).textTheme;
+    final isFavoriteMovie = ref.watch(isFavoriteProvider(movie.id));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,12 +128,31 @@ class _MovieDetails extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.favorite,
-                    color: Colors.pink,
-                    size: 30.0,
-                  )),
+                  onPressed: () async {
+                    // await ref
+                    //     .read(localStorageRepositoryProvider)
+                    //     .toggleFavorite(movie);
+
+                    await ref
+                        .read(favoriteMoviesProvider.notifier)
+                        .toggleFavorite(movie);
+
+                    ref.invalidate(isFavoriteProvider(movie.id));
+                  },
+                  icon: isFavoriteMovie.when(
+                      data: (isFavorite) => isFavorite
+                          ? const Icon(Icons.favorite_rounded,
+                              color: Colors.pink, size: 30.0)
+                          : const Icon(Icons.favorite_outline, size: 30.0),
+                      error: (_, __) => throw UnimplementedError(),
+                      loading: () => const CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ))),
+              // icon: Icon(
+              //   Icons.favorite,
+              //   color: Colors.pink,
+              //   size: 30.0,
+              // )),
               IconButton(
                   onPressed: () {},
                   icon: Icon(
@@ -148,6 +176,7 @@ class _MovieDetails extends StatelessWidget {
           endIndent: 10,
           color: Color.fromARGB(255, 221, 220, 220),
         ),
+
         //*Sinopsis
         Padding(
           padding: const EdgeInsets.all(10),
@@ -199,72 +228,108 @@ class _MovieDetails extends StatelessWidget {
           ),
         ),
 
-        _ActorsByMovie(movieId: movie.id.toString()),
+        SizedBox(
+          height: 10,
+        ),
 
-        const SizedBox(
-          height: 50,
+        DefaultTabController(
+            length: 3,
+            child: TabMovie(
+              movie: movie,
+            )),
+
+        //*Línea
+        // const Divider(
+        //   height: 10,
+        //   thickness: 1,
+        //   indent: 10,
+        //   endIndent: 10,
+        //   color: Color.fromARGB(31, 170, 170, 170),
+        // ),
+      ],
+    );
+  }
+}
+
+class TabMovie extends StatelessWidget {
+  final Movie movie;
+  const TabMovie({super.key, required this.movie});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Column(
+      children: [
+        PreferredSize(
+          preferredSize: Size.fromHeight(300),
+          child: Material(
+            textStyle: TextStyle(fontSize: 50),
+            child: TabBar(
+                labelStyle: TextStyle(fontSize: 15), // Texto seleccionado
+                unselectedLabelStyle: TextStyle(fontSize: 14),
+                tabs: [
+                  Tab(child: Center(child: Text('Detalles'))),
+                  Tab(
+                    child: Center(child: Text('Más títulos similares')),
+                  ),
+                  Tab(child: Center(child: Text('Trailer'))),
+                ]),
+          ),
+        ),
+        Column(
+          children: [
+            SizedBox(
+                height: size.height * 0.6,
+                child: TabBarView(children: [
+                  Column(children: [
+                    //*Actores
+                    ActorsByMovie(movieId: movie.id.toString()),
+                  ]),
+                  Column(
+                    children: [
+                      //*Películas Recomendadas
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: MoviesSimilar(movieId: movie.id),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      //*Trailer
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 30),
+                        child: VideoTrailer(movieId: movie.id),
+                      ),
+                    ],
+                  ),
+                ])),
+          ],
         )
       ],
     );
   }
 }
 
-class _ActorsByMovie extends ConsumerWidget {
-  final String movieId;
-  const _ActorsByMovie({required this.movieId});
+class VideoTrailer extends StatefulWidget {
+  final int movieId;
+  const VideoTrailer({super.key, required this.movieId});
 
   @override
-  Widget build(BuildContext context, ref) {
-    final actorsByMovie = ref.watch(actorsByMovieProvider);
-    if (actorsByMovie[movieId] == null) {
-      return const CircularProgressIndicator(
-        strokeWidth: 2,
-      );
-    }
-    final actors = actorsByMovie[movieId]!;
-    return SizedBox(
-      height: 300,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: actors.length,
-          itemBuilder: (context, index) {
-            final actor = actors[index];
-            return Container(
-              padding: const EdgeInsets.all(8),
-              width: 135,
-              child: Column(
-                children: [
-                  FadeIn(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
-                        actor.profilePath,
-                        height: 150,
-                        width: 135,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    actor.name,
-                    maxLines: 2,
-                    style: const TextStyle(fontSize: 12),
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    actor.character ?? '',
-                    maxLines: 2,
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis),
-                    textAlign: TextAlign.center,
-                  )
-                ],
-              ),
-            );
-          }),
+  State<VideoTrailer> createState() => _VideoTrailerState();
+}
+
+class _VideoTrailerState extends State<VideoTrailer>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Asegura que AutomaticKeepAlive funcione
+    return Center(
+      child: VideosMovie(movieId: widget.movieId),
     );
   }
 }
@@ -276,7 +341,6 @@ class _CustomSliverAppBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final bool isDarkmode = ref.watch(themeNotifierProvider).isDarkMode;
-
     return SliverAppBar(
       floating: true,
       expandedHeight: 10,

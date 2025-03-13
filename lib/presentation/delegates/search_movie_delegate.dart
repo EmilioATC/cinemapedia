@@ -128,19 +128,23 @@ class _MovieItem extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Row(
           children: [
+            // Imagen
             SizedBox(
               width: size.width * 0.2,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  movie.posterPath,
-                  loadingBuilder: (context, child, loadingProgress) =>
-                      FadeIn(child: child),
-                  fit: BoxFit.cover,
-                ),
-              ),
+                  borderRadius: BorderRadius.circular(10),
+                  child: FadeInImage(
+                    height: 130,
+                    fit: BoxFit.cover,
+                    image: NetworkImage(movie.posterPath),
+                    placeholder:
+                        const AssetImage('assets/loaders/action-movie.gif'),
+                  )),
             ),
+
             SizedBox(width: 10),
+
+            //Descripción
             SizedBox(
               width: size.width * 0.6,
               child: Column(

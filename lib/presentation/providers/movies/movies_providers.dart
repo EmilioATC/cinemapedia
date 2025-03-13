@@ -45,3 +45,41 @@ class MoviesNotifier extends StateNotifier<List<Movie>> {
     isLoading = false;
   }
 }
+
+final moviesSimilarProvider =
+    StateNotifierProvider.family<MoviesNotifierSimilar, AsyncValue<List<Movie>>, int>(
+        (ref, int id) {
+  final fetchMoviesSimilar =
+      ref.watch(movieRepositoryProvider).getSimilarMovies;
+  return MoviesNotifierSimilar(fetchMoviesSimilar: fetchMoviesSimilar, id: id);
+});
+
+typedef MoviesSimilarCallback = Future<List<Movie>> Function(int, {int page});
+
+class MoviesNotifierSimilar extends StateNotifier<AsyncValue<List<Movie>>> {
+  int currentPage = 0;
+  bool isLoading = false;
+  final int id;
+  MoviesSimilarCallback fetchMoviesSimilar;
+
+  MoviesNotifierSimilar({required this.fetchMoviesSimilar, required this.id})
+      : super(const AsyncValue.loading()) {
+    loadNextPage();
+  }
+
+  Future<void> loadNextPage() async {
+    if (isLoading) return;
+    isLoading = true;
+
+    try {
+      currentPage++;
+      final movies = await fetchMoviesSimilar(id, page: currentPage);
+      state = AsyncValue.data([...?state.value, ...movies]);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    } finally {
+      await Future.delayed(const Duration(milliseconds: 300));
+      isLoading = false;
+    }
+  }
+}

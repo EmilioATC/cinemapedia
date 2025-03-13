@@ -5,6 +5,7 @@ import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
 class HomeView extends ConsumerStatefulWidget {
+  static const name = 'home-screen';
   const HomeView({super.key});
 
   @override
@@ -48,7 +49,7 @@ class HomeViewState extends ConsumerState<HomeView> {
             MovieHorizontalListview(
               movies: nowPlayingMovies,
               title: 'En cines',
-              subTitle: 'Lunes 20',
+              subTitle: '2025',
               loadNextPage: () =>
                   ref.read(nowPlayingMoviesProvider.notifier).loadNextPage(),
             ),
@@ -56,7 +57,6 @@ class HomeViewState extends ConsumerState<HomeView> {
             MovieHorizontalListview(
               movies: upcomingMovies,
               title: 'Próximamente',
-              subTitle: 'Febrero 2025',
               loadNextPage: () =>
                   ref.read(upcomingMoviesProvider.notifier).loadNextPage(),
             ),
@@ -72,7 +72,7 @@ class HomeViewState extends ConsumerState<HomeView> {
             MovieHorizontalListview(
               movies: topRatedMovies,
               title: 'Mejor calificadas',
-              subTitle: '2025',
+              subTitle: 'General',
               loadNextPage: () =>
                   ref.read(topRatedMoviesProvider.notifier).loadNextPage(),
             ),

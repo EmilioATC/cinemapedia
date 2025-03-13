@@ -2,46 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class CustomBottomNavigation extends StatelessWidget {
-
-final StatefulNavigationShell navigationShell;
+  final StatefulNavigationShell navigationShell;
 
   const CustomBottomNavigation({super.key, required this.navigationShell});
 
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = navigationShell.currentIndex;
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: BottomNavigationBar(
-        onTap: (int index) => navigationShell.goBranch(index),
+        onTap: (int index) => {navigationShell.goBranch(index)},
         currentIndex: navigationShell.currentIndex,
         elevation: 0,
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Icon(Icons.home_max), label: 'Inicio'),
+            icon: Icon(
+              selectedIndex == 0 ? Icons.home_rounded : Icons.home_outlined,
+              size: 30,
+            ),
+            label: 'Inicio',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.label_rounded), label: 'Categorías'),
+            icon:
+                Icon(selectedIndex == 1 ? Icons.people : Icons.people_outline),
+            label: 'Popular',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_outline), label: 'Favoritos'),
+              icon: Icon(
+                  selectedIndex == 2 ? Icons.favorite : Icons.favorite_outline),
+              label: 'Favoritos'),
         ],
       ),
     );
-    // NavigationBar(
-    //   elevation: 0,
-    //   backgroundColor: Colors.white10,
-    //   destinations: const [
-    //     NavigationDestination(
-    //       icon: Icon(Icons.home_max_outlined),
-    //       label: 'Inicio',
-    //     ),
-    //     NavigationDestination(
-    //       icon: Icon(Icons.label_outline),
-    //       label: 'Categorías',
-    //     ),
-    //     NavigationDestination(
-    //       icon: Icon(Icons.favorite_outline),
-    //       label: 'Favoritos',
-    //     ),
-    //   ],
-    // );
   }
 }
