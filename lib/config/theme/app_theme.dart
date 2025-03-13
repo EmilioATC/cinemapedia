@@ -6,7 +6,7 @@ class AppTheme {
   ThemeData getTheme() => ThemeData(
         useMaterial3: true,
         brightness: isDarkMode ? Brightness.dark : Brightness.light,
-        colorSchemeSeed: const Color.fromARGB(255, 40, 105, 245),
+        colorSchemeSeed: Colors.blue,
       );
   AppTheme copyWith({
     int? selectedColor,

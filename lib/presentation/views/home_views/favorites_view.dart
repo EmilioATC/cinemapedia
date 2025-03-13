@@ -14,6 +14,7 @@ class FavoritesView extends ConsumerStatefulWidget {
 class FavoritesViewState extends ConsumerState<FavoritesView> {
   bool isLastPage = false;
   bool isLoading = false;
+  bool iconFavorite = true;
 
   @override
   void initState() {
@@ -34,32 +35,46 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
     }
   }
 
+  void favoriteIcon() {
+    setState(() {
+      iconFavorite = !iconFavorite;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final favoriteMovies = ref.watch(favoriteMoviesProvider).values.toList();
-    if (favoriteMovies.isEmpty){
-      final colors = Theme.of(context).colorScheme;
+
+    if (favoriteMovies.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon( Icons.favorite_outline_sharp, size: 60, color: colors.primary ),
-            Text('Ohhh no!!', style: TextStyle( fontSize: 30, color: colors.primary)),
-            const Text('No tienes películas favoritas', style: TextStyle( fontSize: 20, color: Colors.black45 )),
-
-            const SizedBox(height: 20),
+            IconButton(
+              icon: Icon(iconFavorite == false
+                  ? Icons.favorite_outline
+                  : Icons.favorite),
+              iconSize: 60,
+              color: Colors.pink,
+              onPressed: () => favoriteIcon(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(38.0),
+              child: const Text(
+                  'Para guardar películas, presiona el icono de corazón',
+                  style: TextStyle(fontSize: 20)),
+            ),
+            const SizedBox(height: 10),
             FilledButton.tonal(
-              onPressed: () => context.go("/"), 
-              child: const Text('Empieza a buscar')
-            )
+                onPressed: () => context.go("/"),
+                child: const Text('Empieza a buscar'))
           ],
         ),
       );
     }
     return Scaffold(
-      body: MovieMasonry(
-        loadNextPage: () => loadNextPage(),
-        movies: favoriteMovies));
+        body: MovieMasonry(
+            loadNextPage: () => loadNextPage(), movies: favoriteMovies));
   }
 }

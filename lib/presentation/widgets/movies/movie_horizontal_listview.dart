@@ -1,4 +1,3 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/presentation/widgets/movies/movie_rating.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +58,7 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
               itemCount: widget.movies.length,
               physics: const BouncingScrollPhysics(),
               itemBuilder: (context, index) {
-                return FadeInRight(child: _Slide(movie: widget.movies[index]));
+                return _Slide(movie: widget.movies[index]);
               },
             ),
           )
@@ -133,7 +132,7 @@ class _Title extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
         children: [
-          if (title != null) Text(title!, style: titleStyle),
+          if (title != null) Text(title!, style: titleStyle?.copyWith(fontWeight: FontWeight.w500)),
           const Spacer(),
           if (subTitle != null)
             FilledButton.tonal(
